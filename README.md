@@ -3,8 +3,12 @@
 A brief description of what this repository is for and what it contains
 
 # Contributors
+List contributor names and email addresses
 
-List contributor names and github user names, or email addresses if desired
++ Daisy Wenyan Han daisyhan@bu.edu
++ Divya Sundaresan divyas3@bu.edu
++ Alec Jacobsen aggjacob@bu.edu
++ Emmanuel Saake esaake@bu.edu
 
 # Repository Contents
 
