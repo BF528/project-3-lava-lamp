@@ -1,7 +1,7 @@
 library(limma)
 library(dplyr)
 library(gt)
-
+library(gridExtra)
 # sample info dataframe with array_id and chemical columns
 samples <- read.csv('/project/bf528/project_3/toxgroups/toxgroup_3_mic_info.csv',as.is=TRUE)
 
@@ -40,12 +40,45 @@ l<- read.csv('LEFLUNOMIDE_limma_results.csv')
 f<- read.csv('FLUCONAZOLE_limma_results.csv')
 i<- read.csv('IFOSFAMIDE_limma_results.csv')
 
-#number of significant genes
-nrow(filter(l, adj.P.Val < 0.05))   #466
+#number of significant genes, save into variables as well
+nrow(filter(l, adj.P.Val < 0.05)) #466
 nrow(filter(f, adj.P.Val < 0.05)) #1997
 nrow(filter(i, adj.P.Val < 0.05)) #0
 
+l_sig <- filter(l, adj.P.Val < 0.05) 
+f_sig <-filter(f, adj.P.Val < 0.05) 
+i_sig <-filter(i, adj.P.Val < 0.05)
+
 #top 10 into tables
-l_10 <- l %>% slice(1:10) 
-f_10 <- f %>% slice(1:10) 
-i_10 <- i %>% slice(1:10) 
+l_10 <- l %>% slice(1:10)%>% gt() %>% 
+  tab_header(title = md("This is the top 10 genes adj.p-val <0.05 LEFLUNOMIDE")) %>%
+  tab_options(heading.background.color = "#EFFBFC",
+              table_body.hlines.color = "#989898",
+              table_body.border.top.color = "#989898")
+
+f_10 <- f %>% slice(1:10) %>% gt() %>% 
+  tab_header(title = md("This is the top 10 genes adj.p-val <0.05 FLUCONAZOLE"))  %>% 
+  tab_options(heading.background.color = "#EFFBFC",
+              table_body.hlines.color = "#989898",
+              table_body.border.top.color = "#989898")
+
+i_10 <- i %>% slice(1:10) %>% gt() %>% 
+  tab_header(title = md("This is the top 10 genes adj.p-val <0.05 IFOSFAMIDE")) %>% 
+  tab_options(heading.background.color = "#EFFBFC",
+              table_body.hlines.color = "#989898",
+              table_body.border.top.color = "#989898")
+
+#Histograms of fold change values
+a <-hist(l$logFC, main = 'LEFLUNOMIDE', xlab = "", ylab = "Frequency", breaks = 20)
+b <-hist(f$logFC, main = 'FLUCONAZOLE', xlab = "fold change", ylab = "", breaks = 20)
+c <- hist(i$logFC, main = 'IFOSFAMIDE', xlab = "", ylab = "", breaks = 20)
+
+#scatter plots
+par(mfrow =c(3,1))
+plot1 <- ggplot(l_sig, aes(x=logFC, y= -log10(P.Value)))+
+  geom_point(size=2, shape=23) + xlab("")
+plot2 <- ggplot(f_sig, aes(x=logFC, y= -log10(P.Value))) +
+  geom_point(size=2, shape=23) + ylab("")
+plot3 <- ggplot(i_sig, aes(x=logFC, y= -log10(P.Value))) +
+  geom_point(size=2, shape=23) + xlab("") + ylab("")
+grid.arrange(plot1, plot2, plot3, ncol=3)
