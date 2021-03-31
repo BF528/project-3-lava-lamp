@@ -1,0 +1,31 @@
+#!/bin/bash -l
+
+#$ -P bf528
+#$ -j y
+#$ -cwd
+#$ -pe omp 16
+#$ -l mem_total=200G
+#$ -m be
+#$ -o featureCounts.log
+#$ -N featureCounts
+
+# Example STAR alignments - /project/bf528/project_3/samples/*.bam
+# Metadata for these files - /project/bf528/project_3/groups/group_EX_rna_info.csv
+
+# Load packages
+module load subread
+
+# GTF file path
+GTF=/project/bf528/project_3/reference/rn4_refGene_20180308.gtf
+
+# Run featureCounts for all BAM files in sample folder
+for FILE in /projectnb/bf528/users/lava_lamp/project_3/bams/*.bam
+    do
+        fname=$(basename "$FILE")
+        OUT=/projectnb/bf528/users/lava_lamp/project_3/daisy_pr3/featureCounts/$fname.txt
+        featureCounts -T 16 -a $GTF -o $OUT $FILE
+    done
+    
+# MultiQC on Summary Files
+pip install multiqc # multiQC module on SCC broken
+multiqc /projectnb/bf528/users/lava_lamp/project_3/daisy_pr3/featureCounts/summary/
