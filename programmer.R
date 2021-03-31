@@ -156,15 +156,33 @@ dev.off()
 # Volcano Plots
 library(EnhancedVolcano)
 
+png("figures/volcano_ahr.png", width = 800, height = 480)
 EnhancedVolcano(res_ahr,
                 lab = rownames(res_ahr),
                 x = 'log2FoldChange',
                 y = 'pvalue',
                 title = 'AhR Differentially Expressed Genes',
                 pCutoff = 0.05,
-                FCcutoff = 0.5,
-                legendPosition = 'bottom')
-
-counts_ahr %>%
-  ggplot(mapping = aes(x = log2FoldChange, y = -log(pvalue))) +
-  geom_point()
+                FCcutoff = 1.5,
+                legendPosition = 'right')
+dev.off()
+png("figures/volcano_car.png", width = 800, height = 480)
+EnhancedVolcano(res_car,
+                lab = rownames(res_car),
+                x = 'log2FoldChange',
+                y = 'pvalue',
+                title = 'CAR/PTX Differentially Expressed Genes',
+                pCutoff = 0.05,
+                FCcutoff = 1.5,
+                legendPosition = 'right')
+dev.off()
+png("figures/volcano_dna.png", width = 800, height = 480)
+EnhancedVolcano(res_dna,
+                lab = rownames(res_dna),
+                x = 'log2FoldChange',
+                y = 'pvalue',
+                title = 'DNA Damage Differentially Expressed Genes',
+                pCutoff = 0.05,
+                FCcutoff = 1.5,
+                legendPosition = 'right')
+dev.off()
