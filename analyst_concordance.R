@@ -76,7 +76,7 @@ n0_i<- n0_calculation(overlap_mic =DEGs_micro_i, overlap_rn =DEGs_RNA_i, map = m
 concord <- function (n0, total_DEG_mi, total_DEG_rn){
   n1 <- total_DEG_mi
   n2 <- total_DEG_rn
-  #N: total possible genes in the rat genome?
+  #N: total possible detected genes from microarray and rna-seq platforms 
   N <- 13079 
   #background corrected
   bg_intersect<- (N*n0 - n1*n2)/(n0+N-n1-n2)
@@ -84,7 +84,7 @@ concord <- function (n0, total_DEG_mi, total_DEG_rn){
   return (concordance)
 }
 
-#plot concordance against MICRO for each treatment
+#plot concordance against MICRO for each treatment------
 png("concord.png")
 x <- c(total_DEGs_micro_l, total_DEGs_micro_f, total_DEGs_micro_i)
 y <- c(concord(n0_l, total_DEGs_micro_l, total_DEGs_RNA_l), 
@@ -94,8 +94,9 @@ y <- c(concord(n0_l, total_DEGs_micro_l, total_DEGs_RNA_l),
 plot(x, y, xlab = 'Micro Array genes', ylab = 'Concordance')
 text(x,y-0.005,labels=c('lef','flu', 'ifo'))
 dev.off()
+
+#plot concordance against RNA-seq for each treatment--------
 png("concord1.png")
-#plot concordance against RNA-seq for each treatment
 x <- c(total_DEGs_RNA_l, total_DEGs_RNA_f, total_DEGs_RNA_i)
 y <- c(concord(n0_l, total_DEGs_micro_l, total_DEGs_RNA_l), 
        concord(n0_f, total_DEGs_micro_f, total_DEGs_RNA_f), 
@@ -103,14 +104,17 @@ y <- c(concord(n0_l, total_DEGs_micro_l, total_DEGs_RNA_l),
 plot(x, y, xlab = 'RNA seq genes', ylab = '')
 text(x,y-0.005,labels=c('lef','flu', 'ifo'))
 dev.off()
-#above median and below leflu, n0
+
+#Calculating Above and Below--------------------------------
+#above median and below leflu, n0 (observed overlaps)
 a<- n0_calculation(overlap_mic =DEGs_micro_l, overlap_rn =DEGs_RNA_l, map = map, above = 'y', below = 'n')
 b<- n0_calculation(overlap_mic =DEGs_micro_l, overlap_rn =DEGs_RNA_l, map = map, above = 'n', below = 'y')
 
-#above median and below fluco, n0
+#above median and below fluco, n0 (observed overlaps)
 c<- n0_calculation(overlap_mic =DEGs_micro_f, overlap_rn =DEGs_RNA_f, map = map, above = 'y', below = 'n')
 d<- n0_calculation(overlap_mic =DEGs_micro_f, overlap_rn =DEGs_RNA_f, map = map, above = 'n', below = 'y')
 
+#join above, overlap, below into one variable for each treatment
 concord_l = c(concord(a, total_DEGs_micro_l, total_DEGs_RNA_l), 
               concord(n0_l, total_DEGs_micro_l, total_DEGs_RNA_l), 
               concord(b, total_DEGs_micro_l, total_DEGs_RNA_l))
@@ -120,17 +124,20 @@ concord_f <-c(concord(c, total_DEGs_micro_f, total_DEGs_RNA_f),
               concord(d, total_DEGs_micro_f, total_DEGs_RNA_f))
 
 concord_i <-c(0,0,0)
-#combine into vector:
-#plot
+
+#combine into vector and then dataframe for barplot:
 concordances <- c(concord_l, concord_f,concord_i)
 chemical <- rep(c('Leflunomide/AhR', 'Fluconazole/CAR', 'Ifosfamide/DNA'), each =3)
 group <- rep(c('above', 'overall', 'below'), 3)
 
 df <- data.frame(concordances, chemical, group)
 
+#plot above, below, overall concordance for each treatment 
 p <- ggplot(data=df, aes(x=chemical, y=concordances, fill=group)) +
   geom_bar(stat="identity", color="black", position=position_dodge())+
   theme_minimal() + ggtitle('Above, Overall, and Below Median Subsets Concardances per Treatment')
+
+#save in png
 png('above_below.png')
 p
 dev.off()
